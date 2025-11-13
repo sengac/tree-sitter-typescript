@@ -52,7 +52,6 @@
     "prebuildify": "^6.0.1"
   },
   "scripts": {
-    "install": "node-gyp-build",
     "lint": "eslint common/define-grammar.js",
     "test": "node --test bindings/node/*_test.js"
   },
