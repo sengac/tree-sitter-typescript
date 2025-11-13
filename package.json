@@ -1,6 +1,6 @@
 {
   "name": "tree-sitter-typescript",
-  "version": "0.23.2",
+  "version": "0.23.3",
   "description": "TypeScript and TSX grammars for tree-sitter",
   "repository": "https://github.com/tree-sitter/tree-sitter-typescript",
   "license": "MIT",
@@ -55,5 +55,7 @@
     "install": "node-gyp-build",
     "lint": "eslint common/define-grammar.js",
     "test": "node --test bindings/node/*_test.js"
+    ,
+    "prebuild": "prebuildify --napi --strip --arch x64+arm64 --platform linux+darwin+win32"
   }
 }
