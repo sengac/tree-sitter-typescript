@@ -14,13 +14,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  prebuild:
-    uses: tree-sitter/workflows/.github/workflows/package-prebuild.yml@main
+  npm:
+    uses: tree-sitter/workflows/.github/workflows/package-npm.yml@main
     with:
-      platforms: >-
-        windows-2025,
-        windows-11-arm,
-        ubuntu-24.04,
-        ubuntu-24.04-arm,
-        macos-15,
-        macos-15-intel
+      generate: false
