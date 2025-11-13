@@ -55,7 +55,5 @@
     "install": "node-gyp-build",
     "lint": "eslint common/define-grammar.js",
     "test": "node --test bindings/node/*_test.js"
-    ,
-    "prebuild": "prebuildify --napi --strip --arch x64+arm64 --platform linux+darwin+win32"
   }
 }
