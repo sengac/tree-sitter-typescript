@@ -5,7 +5,6 @@ on:
     branches:
       - main
       - master
-      - 'fix/**'
   pull_request:
   workflow_dispatch:
 
@@ -14,9 +13,78 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  npm:
-    uses: tree-sitter/workflows/.github/workflows/package-npm.yml@main
-    secrets:
-      NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
-    with:
-      generate: false
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-14
+            name: darwin-arm64
+          - os: macos-13
+            name: darwin-x64
+          - os: ubuntu-22.04
+            name: linux-x64
+          - os: ubuntu-22.04
+            name: linux-arm64
+          - os: windows-2022
+            name: win32-x64
+          - os: windows-2022
+            name: win32-arm64
+
+    runs-on: ${{ matrix.os }}
+    name: Build ${{ matrix.name }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build prebuild
+        run: npm run prebuildify
+        env:
+          PREBUILD_ARCH: ${{ contains(matrix.name, 'arm64') && 'arm64' || 'x64' }}
+
+      - name: Upload prebuilds
+        uses: actions/upload-artifact@v4
+        with:
+          name: prebuilds-${{ matrix.name }}
+          path: prebuilds/
+          retention-days: 1
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Download all prebuilds
+        uses: actions/download-artifact@v4
+        with:
+          path: prebuilds-temp
+
+      - name: Organize prebuilds
+        run: |
+          mkdir -p prebuilds
+          cp -r prebuilds-temp/prebuilds-*/* prebuilds/
+          ls -R prebuilds
+
+      - name: Publish to npm
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
