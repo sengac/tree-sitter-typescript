@@ -1,6 +1,6 @@
 {
   "name": "@sengac/tree-sitter-typescript",
-  "version": "0.25.4",
+  "version": "0.25.5",
   "description": "TypeScript and TSX grammars for tree-sitter",
   "repository": "https://github.com/sengac/tree-sitter-typescript",
   "license": "MIT",
@@ -54,7 +54,8 @@
   "scripts": {
     "lint": "eslint common/define-grammar.js",
     "test": "node --test bindings/node/*_test.js",
-    "install": "node-gyp-build"
+    "install": "node-gyp-build",
+    "prebuildify": "prebuildify --napi --name node.napi"
   },
   "publishConfig": {
     "access": "public"
